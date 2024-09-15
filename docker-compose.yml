@@ -1,50 +1,28 @@
-version: '3.8'
-
+version: "3.8"
 services:
+  book_catalog:
+    build: ./book_catalog
+    environment:
+      DATABASE_URL: "postgresql://assessment_part_2_user:QJVGtCXlv9JULkLi34Ou7MCc4b9vcGvl@dpg-cripj5jv2p9s738mbqvg-a.singapore-postgres.render.com/assessment_part_2"
+    ports:
+      - "8001:8000"
+    depends_on:
+      - db
+
+  inventory_management:
+    build: ./inventory_management
+    environment:
+      DATABASE_URL: "postgresql://assessment_part_2_user:QJVGtCXlv9JULkLi34Ou7MCc4b9vcGvl@dpg-cripj5jv2p9s738mbqvg-a.singapore-postgres.render.com/assessment_part_2"
+    ports:
+      - "8002:8000"
+    depends_on:
+      - db
+
   db:
-    image: postgres:16.4
+    image: postgres
     environment:
       POSTGRES_DB: assessment_part_2
       POSTGRES_USER: assessment_part_2_user
       POSTGRES_PASSWORD: QJVGtCXlv9JULkLi34Ou7MCc4b9vcGvl
     ports:
       - "5432:5432"
-    volumes:
-      - db_data:/var/lib/postgresql/data
-
-  book_catalog:
-    build:
-      context: ./book_catalog
-    depends_on:
-      - db
-    environment:
-      DATABASE_URL: postgresql://assessment_part_2_user:QJVGtCXlv9JULkLi34Ou7MCc4b9vcGvl@dpg-cripj5jv2p9s738mbqvg-a.singapore-postgres.render.com/assessment_part_2?sslmode=require
-    ports:
-      - "8000:8000"
-    command: uvicorn app.main:app --host 0.0.0.0 --port 8000
-    volumes:
-      - ./book_catalog:/app
-    networks:
-      - app-network
-
-  inventory_management:
-    build:
-      context: ./inventory_management
-    depends_on:
-      - db
-    environment:
-      DATABASE_URL: postgresql://assessment_part_2_user:QJVGtCXlv9JULkLi34Ou7MCc4b9vcGvl@dpg-cripj5jv2p9s738mbqvg-a.singapore-postgres.render.com/assessment_part_2?sslmode=require
-    ports:
-      - "8001:8001"
-    command: uvicorn app.main:app --host 0.0.0.0 --port 8001
-    volumes:
-      - ./inventory_management:/app
-    networks:
-      - app-network
-
-volumes:
-  db_data:
-
-networks:
-  app-network:
-    driver: bridge
